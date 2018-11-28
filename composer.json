@@ -1,0 +1,12 @@
+{
+    "name": "echo/aicom",
+    "description": "my first",
+    "type": "library",
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+	    "psr-4": {
+	        "Eecho\\": "src/"
+	    }
+	}
+}
