@@ -1,7 +1,7 @@
 <?php
 require_once './vendor/autoload.php';
 
-use Eecho\Aicom;
+use My\Zxt;
 
-$a = new Aicom();
+$a = new Zxt();
 $a->echo_m();

@@ -1,12 +1,12 @@
 {
-    "name": "echo/aicom",
-    "description": "my first",
+    "name": "My/zxt",
+    "description": "my diy app",
     "type": "library",
     "minimum-stability": "dev",
     "require": {},
     "autoload": {
 	    "psr-4": {
-	        "Eecho\\": "src/"
+	        "My\\": "src/"
 	    }
 	}
 }
