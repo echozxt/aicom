@@ -26,8 +26,10 @@ class Zxt
 	{
 		foreach ($_SERVER as $name=>$value)
 		{
-			if(substr($name,0,5)=='HTTP_') $headers[$full ? $name :str_replace('','-',strtolower(str_replace('_','',substr($name,5))))] = $value;
-			//var_dump(str_replace('','-',ucwords(strtolower(str_replace('_','',substr($name,5))))));
+			if(substr($name,0,5)=='HTTP_'){
+				$headers[$full ? $name :str_replace('','-',strtolower(str_replace('_','',substr($name,5))))] = $value;
+			}
+			
 		}
 		if($key !== null){
 			return $key != '' && isset($headers[strtolower($key)]) ? $headers[strtolower($key)] : null;
@@ -43,16 +45,36 @@ class Zxt
 	 */
 	public function get_token($key = 'token',$method = 'head')
 	{
+		if($method == 'head'){
+			return $this->get_h($key);
+		}
 		if($method == 'post'){
 			return isset($_POST[$key]) ? $_POST[$key] : null;
 		}
 		if($method == 'get'){
 			return isset($_GET[$key]) ? $_GET[$key] : null;
 		}
-		if($method == 'head'){
-			return $this->get_h($key);
-		}
 		
 		return  $this->get_h($key) ?: ( isset($_POST[$key]) ? $_POST[$key] : null) ?: (isset($_GET[$key]) ? $_GET[$key] : null)?:null;
+	}
+
+	/**
+	 * 跨域
+	 * @param  string || array $data [允许跨域的站点]
+	 */
+	public function kuayu($data='')
+	{
+		if($data){
+			if(is_string($data)){
+				header('Access-Control-Allow-Origin:'.$data);
+			}
+			if(is_array($data)){
+				foreach ($data as $value) {
+					header('Access-Control-Allow-Origin:'.$value);
+				}
+			}
+		} else {
+			header('Access-Control-Allow-Origin:*');
+		}
 	}
 }
