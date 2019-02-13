@@ -77,4 +77,44 @@ class Zxt
 			header('Access-Control-Allow-Origin:*');
 		}
 	}
+
+	/**
+	 * 获取签名sign
+	 * @param  [array || string] $data [参数]
+	 * @return [string]        [sign]
+	 */
+	public function get_sign($data, $salt = '')
+    {
+        if(is_array($data)){
+            ksort($data);
+
+            $str = '';
+            foreach ($data as $key => $value) {
+                if($key != 'sign') $str .= $key.'='.$value.'&';
+            }
+
+            return  md5(substr($str,0,-1).$salt);
+        }
+
+        if(is_string($data)) return md5($data.$salt);
+        return false;
+
+    }
+
+    /**
+     * 检查签名
+     * @param  [array || string] $data [参数]
+     * @param  string $sign [签名，可选，优先使用传进来的签名，不传用参数里的sign]
+     * @return [boolean]       [description]
+     */
+    public function check_sign($data, $sign = '', $salt = '')
+    {
+        $rs = $this->get_sign($data,$salt);
+
+        if($sign) return $rs == $sign;
+
+        if(isset($data['sign']) && $rs) return $rs == $data['sign'];
+
+        return false;
+    }
 }
