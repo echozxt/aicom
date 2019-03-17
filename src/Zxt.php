@@ -6,15 +6,68 @@ namespace My;
  */
 class Zxt
 {
+	private $public = '';
+	private $private = '';
 	
+	public function set_public($public = '')
+	{
+		$this->public = $public;
+	}
+	public function set_private($private = '')
+	{
+		$this->private = $private;
+	}
 	public function echo_m()
 	{
+		echo '<pre>';
+		var_dump($this->public);
+		die;
 		echo '<pre>this is my diy composer pack;';
 		$h = $this->get_token('token','21');
 		var_dump($h);
 
 	}
+	public function rsa_encode(string $data,$public = '')
+	{
+		$data = str_split($data,50);
 
+		$public = $public ?:$this->public;
+		$public = openssl_pkey_get_public($public);
+		if(!$public ) return false;
+
+		$encode = '';
+		foreach ($data as $key => $value) {
+			$temp = '';
+			openssl_public_encrypt($value,$temp,$public);
+			$encode .=$temp;
+
+		}
+		openssl_free_key($public);
+		return base64_encode($encode);
+	}
+	public function rsa_decode(string $data,$private = '')
+	{
+		$data = base64_decode($data);
+		if(!$data) return false;
+
+
+		$private = $private ?:$this->private;
+		$private = openssl_pkey_get_private($private);
+		if(!$private) return false;
+
+		$res = '';
+		$length = strlen($data)/128;
+		for ($i=0; $i < $length; $i++) { 
+			$temp = substr($data,$i * 128,128);
+			$temp_decode = '';
+			openssl_private_decrypt($temp,$temp_decode,$private);
+			$res .= $temp_decode;
+
+		}
+
+		openssl_free_key($private);
+		return ($res);
+	}
 	/**
 	 * get_header
 	 * 获取header 
@@ -84,22 +137,22 @@ class Zxt
 	 * @return [string]        [sign]
 	 */
 	public function get_sign($data, $salt = '')
-    {
-        if(is_array($data)){
-            ksort($data);
+	{
+		if(is_array($data)){
+			ksort($data);
 
-            $str = '';
-            foreach ($data as $key => $value) {
-                if($key != 'sign') $str .= $key.'='.$value.'&';
-            }
+			$str = '';
+			foreach ($data as $key => $value) {
+				if($key != 'sign') $str .= $key.'='.$value.'&';
+			}
 
-            return  md5(substr($str,0,-1).$salt);
-        }
+			return  md5(substr($str,0,-1).$salt);
+		}
 
-        if(is_string($data)) return md5($data.$salt);
-        return false;
+		if(is_string($data)) return md5($data.$salt);
+		return false;
 
-    }
+	}
 
     /**
      * 检查签名
@@ -109,12 +162,13 @@ class Zxt
      */
     public function check_sign($data, $sign = '', $salt = '')
     {
-        $rs = $this->get_sign($data,$salt);
+    	$rs = $this->get_sign($data,$salt);
 
-        if($sign) return $rs == $sign;
+    	if($sign) return $rs == $sign;
 
-        if(isset($data['sign']) && $rs) return $rs == $data['sign'];
+    	if(isset($data['sign']) && $rs) return $rs == $data['sign'];
 
-        return false;
+    	return false;
     }
+
 }
